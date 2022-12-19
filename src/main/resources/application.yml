@@ -1,0 +1,3 @@
+spring.datasource.url: jdbc:postgresql://localhost:5432/passwordgenerator?useSSL=false
+spring.datasource.username: postrgres
+spring.datasource.password: password
