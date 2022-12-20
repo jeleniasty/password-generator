@@ -1,17 +1,19 @@
 package com.jeleniasty.passwordgenerator.service;
 
 import com.jeleniasty.passwordgenerator.entity.Password;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class PasswordServiceImpl implements PasswordService{
     @Override
-    public List<String> getPasswords(int numberOfPasswords) {
+    public List<Password> getPasswords(int numberOfPasswords) {
 
-        List<String> passwords = new ArrayList<>();
+        List<Password> passwords = new ArrayList<>();
 
         while (passwords.size() < numberOfPasswords) {
             int random = (int) (4 * Math.random());
@@ -27,7 +29,7 @@ public class PasswordServiceImpl implements PasswordService{
 
 
 
-    public String getWeakPassword() {
+    public Password getWeakPassword() {
         // słabe (długość do 5 znaków, bez znaków specjalnych, tylko małe litery lub duże litery)
 
         int numberOfCharacters = (int) (5 *  Math.random()) + 1;
@@ -43,10 +45,13 @@ public class PasswordServiceImpl implements PasswordService{
             }
         }
 
-        return String.valueOf(stringBuilder);
+        return new Password(
+                getTimestampDD_MM_YYYY_HH_MM_SS(),
+                String.valueOf(stringBuilder),
+                PasswordStrength.WEAK);
     }
 
-    public String getMediumPassword() {
+    public Password getMediumPassword() {
 
 //      średnie (długość powyżej 5 znaków, bez znaków specjalnych, małe lub duże litery)
 
@@ -64,10 +69,13 @@ public class PasswordServiceImpl implements PasswordService{
             }
         }
 
-        return String.valueOf(stringBuilder);
+        return new Password(
+                getTimestampDD_MM_YYYY_HH_MM_SS(),
+                String.valueOf(stringBuilder),
+                PasswordStrength.MEDIUM);
     }
 
-    public String getStrongPassword() {
+    public Password getStrongPassword() {
 
 //      silne (długość powyżej 8 znaków, znaki specjalne, małe i duże litery)
 
@@ -86,10 +94,13 @@ public class PasswordServiceImpl implements PasswordService{
             }
         }
 
-        return String.valueOf(stringBuilder);
+        return new Password(
+                getTimestampDD_MM_YYYY_HH_MM_SS(),
+                String.valueOf(stringBuilder),
+                PasswordStrength.STRONG);
     }
 
-    public String getUberStrongPassword() {
+    public Password getUberStrongPassword() {
 
 //      uber silne (długość powyżej 16 znaków, znaki specjalne, małe i duże litery)
 
@@ -108,7 +119,10 @@ public class PasswordServiceImpl implements PasswordService{
             }
         }
 
-        return String.valueOf(stringBuilder);
+        return new Password(
+                getTimestampDD_MM_YYYY_HH_MM_SS(),
+                String.valueOf(stringBuilder),
+                PasswordStrength.UBER_STRONG);
     }
 
     private char getRandomLowerCaseLetter() {
@@ -140,7 +154,10 @@ public class PasswordServiceImpl implements PasswordService{
 
     public static void main(String[] args) {
     PasswordServiceImpl passwordService = new PasswordServiceImpl();
-        System.out.println(passwordService.getTimestampDD_MM_YYYY_HH_MM_SS());
+    Password password = passwordService.getStrongPassword();
+        System.out.println(password.getDate());
+        System.out.println(password.getPassword());
+        System.out.println(password.getPasswordStrength());
 
     }
 

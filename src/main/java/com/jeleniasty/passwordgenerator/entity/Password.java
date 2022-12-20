@@ -1,9 +1,13 @@
 package com.jeleniasty.passwordgenerator.entity;
 
-public class Password {
+import com.jeleniasty.passwordgenerator.service.PasswordStrength;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-    private int id;
+@AllArgsConstructor
+@Getter
+public class Password {
     private String date;
     private String password;
-    private String passwordStrength;
+    private PasswordStrength passwordStrength;
 }
