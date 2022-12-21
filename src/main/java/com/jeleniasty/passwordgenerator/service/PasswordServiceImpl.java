@@ -81,7 +81,7 @@ public class PasswordServiceImpl implements PasswordService {
     private void savePasswords(List<PasswordDTO> passwords) {
 
         passwordRepository.saveAll(passwords.stream()
-                .filter(password -> password.getSource() == Source.DATABASE)
+                .filter(password -> password.getSource() == Source.GENERATED)
                 .map(passwordDTO -> new Password(
                         passwordDTO.getDate(),
                         passwordEncryptor.encrypt(passwordDTO.getPassword(), KEY),
@@ -92,11 +92,8 @@ public class PasswordServiceImpl implements PasswordService {
     @Override
     public List<Password> checkPassword(String password) {
         if (passwordRepository.findByPassword(passwordEncryptor.encrypt(password, KEY)).isEmpty()) {
-            List<Password> passwords = new ArrayList<>();
-            passwords.add(new Password(
-                    password,
-                    checkPasswordStrength(password)));
-            return passwords;
+            throw new PasswordNotFoundException("Password " + "'" + password + "'" +
+                    " not found, password strength: " + checkPasswordStrength(password));
         }
         return passwordRepository.findByPassword(passwordEncryptor.encrypt(password, KEY));
     }
@@ -104,7 +101,10 @@ public class PasswordServiceImpl implements PasswordService {
     @Override
     @Transactional
     public void deletePassword(String password) {
-
+        if (passwordRepository.findByPassword(passwordEncryptor.encrypt(password, KEY)).isEmpty()) {
+            throw new PasswordNotFoundException("Password " + "'" + password + "'" +
+                    " not found, password strength: " + checkPasswordStrength(password));
+        }
         passwordRepository.deleteByPassword(passwordEncryptor.encrypt(password, KEY));
     }
 
@@ -153,7 +153,7 @@ public class PasswordServiceImpl implements PasswordService {
 
     private Source getPasswordSource(String password) {
         List<Password> passwordsFound = passwordRepository.findByPassword(passwordEncryptor.encrypt(password, KEY));
-        return passwordsFound == null ? Source.GENERATED : Source.DATABASE;
+        return passwordsFound.isEmpty() ? Source.GENERATED : Source.DATABASE;
     }
 
     private String generatePassword(int numberOfCharacters, String characters) {
