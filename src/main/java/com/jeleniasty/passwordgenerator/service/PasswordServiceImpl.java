@@ -38,7 +38,7 @@ public class PasswordServiceImpl implements PasswordService {
             String password;
 
             if (hasSpecialCharacters) {
-                password = generatePassword(passwordLength, LOWERCASE_LETTERS+UPPERCASE_LETTERS+SPECIAL_CHARACTERS);
+                password = generatePassword(passwordLength, LOWERCASE_LETTERS + UPPERCASE_LETTERS + SPECIAL_CHARACTERS);
             } else if (hasLowerCaseLetters && hasUpperCaseLetters) {
                 password = generatePassword(passwordLength, LOWERCASE_LETTERS + UPPERCASE_LETTERS);
             } else if (!hasLowerCaseLetters) {
@@ -55,7 +55,7 @@ public class PasswordServiceImpl implements PasswordService {
 
         savePasswords(passwords);
 
-        return passwords;
+        return passwords.stream().distinct().collect(Collectors.toList());
     }
 
     @Override
@@ -75,12 +75,14 @@ public class PasswordServiceImpl implements PasswordService {
 
         savePasswords(passwords);
 
-        return passwords;
+        return passwords.stream().distinct().collect(Collectors.toList());
     }
 
     private void savePasswords(List<PasswordDTO> passwords) {
 
-        passwordRepository.saveAll(passwords.stream()
+        passwordRepository.saveAll(passwords
+                .stream()
+                .distinct()
                 .filter(password -> password.getSource() == Source.GENERATED)
                 .map(passwordDTO -> new Password(
                         passwordDTO.getDate(),
@@ -90,12 +92,12 @@ public class PasswordServiceImpl implements PasswordService {
     }
 
     @Override
-    public List<Password> checkPassword(String password) {
-        if (passwordRepository.findByPassword(passwordEncryptor.encrypt(password, KEY)).isEmpty()) {
-            throw new PasswordNotFoundException("Password " + "'" + password + "'" +
-                    " not found, password strength: " + checkPasswordStrength(password));
-        }
-        return passwordRepository.findByPassword(passwordEncryptor.encrypt(password, KEY));
+    public Password checkPassword(String password) {
+        return passwordRepository.findByPassword(passwordEncryptor.encrypt(password, KEY))
+                .orElseThrow(
+                        () -> new PasswordNotFoundException("Password " + "'" + password + "'" +
+                                " not found, password strength: " + checkPasswordStrength(password))
+                );
     }
 
     @Override
@@ -152,8 +154,9 @@ public class PasswordServiceImpl implements PasswordService {
     }
 
     private Source getPasswordSource(String password) {
-        List<Password> passwordsFound = passwordRepository.findByPassword(passwordEncryptor.encrypt(password, KEY));
-        return passwordsFound.isEmpty() ? Source.GENERATED : Source.DATABASE;
+        return passwordRepository.findByPassword(passwordEncryptor.encrypt(password, KEY))
+                .map(p -> Source.DATABASE)
+                .orElse(Source.GENERATED);
     }
 
     private String generatePassword(int numberOfCharacters, String characters) {

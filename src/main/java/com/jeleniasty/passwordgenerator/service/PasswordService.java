@@ -14,7 +14,7 @@ public interface PasswordService {
                                                  int numberOfPasswords);
     List<PasswordDTO> generateRandomPasswords(int numberOfPasswords);
 
-    List<Password> checkPassword(String password);
+    Password checkPassword(String password);
 
     void deletePassword(String password);
 }

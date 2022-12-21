@@ -35,12 +35,12 @@ public class PasswordController {
     }
 
     @GetMapping("/passwords/check")
-    private List<Password> checkPassword(@RequestBody String password) {
+    public Password checkPassword(@RequestBody String password) {
         return passwordService.checkPassword(password);
     }
 
     @DeleteMapping("/passwords/delete")
-    private void deletePassword(@RequestBody String password) {
+    public void deletePassword(@RequestBody String password) {
         passwordService.deletePassword(password);
     }
 }
