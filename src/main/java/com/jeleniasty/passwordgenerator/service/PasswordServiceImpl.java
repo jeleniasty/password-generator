@@ -81,7 +81,7 @@ public class PasswordServiceImpl implements PasswordService {
     private void savePasswords(List<PasswordDTO> passwords) {
 
         passwordRepository.saveAll(passwords.stream()
-                .filter(password -> password.getSource() == Source.GENERATED)
+                .filter(password -> password.getSource() == Source.DATABASE)
                 .map(passwordDTO -> new Password(
                         passwordDTO.getDate(),
                         passwordEncryptor.encrypt(passwordDTO.getPassword(), KEY),
@@ -90,11 +90,13 @@ public class PasswordServiceImpl implements PasswordService {
     }
 
     @Override
-    public Password checkPassword(String password) {
-        if (passwordRepository.findByPassword(passwordEncryptor.encrypt(password, KEY)) == null) {
-            return new Password(
+    public List<Password> checkPassword(String password) {
+        if (passwordRepository.findByPassword(passwordEncryptor.encrypt(password, KEY)).isEmpty()) {
+            List<Password> passwords = new ArrayList<>();
+            passwords.add(new Password(
                     password,
-                    checkPasswordStrength(password));
+                    checkPasswordStrength(password)));
+            return passwords;
         }
         return passwordRepository.findByPassword(passwordEncryptor.encrypt(password, KEY));
     }
@@ -150,8 +152,8 @@ public class PasswordServiceImpl implements PasswordService {
     }
 
     private Source getPasswordSource(String password) {
-        Password passwordFound = passwordRepository.findByPassword(passwordEncryptor.encrypt(password, KEY));
-        return passwordFound == null ? Source.GENERATED : Source.DATABASE;
+        List<Password> passwordsFound = passwordRepository.findByPassword(passwordEncryptor.encrypt(password, KEY));
+        return passwordsFound == null ? Source.GENERATED : Source.DATABASE;
     }
 
     private String generatePassword(int numberOfCharacters, String characters) {
