@@ -1,13 +1,15 @@
-package com.jeleniasty.passwordgenerator.entity;
+package com.jeleniasty.passwordgenerator.dto;
 
 import com.jeleniasty.passwordgenerator.service.PasswordStrength;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @AllArgsConstructor
 @Getter
-public class Password {
-    private String date;
+public class PasswordDTO {
+    private LocalDateTime date;
     private String password;
     private PasswordStrength passwordStrength;
 }

@@ -1,19 +1,45 @@
 package com.jeleniasty.passwordgenerator.service;
 
-import com.jeleniasty.passwordgenerator.entity.Password;
+import com.jeleniasty.passwordgenerator.repository.Password;
+import com.jeleniasty.passwordgenerator.repository.PasswordRepository;
+import com.jeleniasty.passwordgenerator.dto.PasswordDTO;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class PasswordServiceImpl implements PasswordService{
-    @Override
-    public List<Password> getPasswords(int numberOfPasswords) {
+    private final PasswordRepository passwordRepository;
 
-        List<Password> passwords = new ArrayList<>();
+    private final PasswordEncoder passwordEncoder;
+
+    public void save(PasswordDTO passwordDTO) {
+        passwordRepository.save(new Password(
+                passwordDTO.getDate(),
+                passwordDTO.getPassword(),
+                passwordDTO.getPasswordStrength()));
+    }
+    public Password findById(long id) {
+        Optional<Password> result = passwordRepository.findById(id);
+        Password passwordDAO = null;
+        if (result.isPresent()) {
+            passwordDAO = result.get();
+        } else {
+            throw new RuntimeException("Did not find employee id");
+        }
+        return passwordDAO;
+    }
+    @Override
+    public List<PasswordDTO> generatePasswords(int numberOfPasswords) {
+
+        List<PasswordDTO> passwords = new ArrayList<>();
 
         while (passwords.size() < numberOfPasswords) {
             int random = (int) (4 * Math.random());
@@ -24,141 +50,137 @@ public class PasswordServiceImpl implements PasswordService{
                 case 3 -> passwords.add(getUberStrongPassword());
             }
         }
+        passwordRepository.saveAll(passwords.stream()
+                .map(passwordDTO -> new Password(
+                        passwordDTO.getDate(),
+                        passwordEncoder.encode(passwordDTO.getPassword()),
+                        passwordDTO.getPasswordStrength()))
+                .collect(Collectors.toList()));
+
         return passwords;
     }
 
+    @Override
+    public PasswordDTO checkPassword(String password) {
+        return null;
+    }
 
+    @Override
+    public PasswordDTO deletePassword(String password) {
+        return null;
+    }
 
-    public Password getWeakPassword() {
+    private PasswordDTO getWeakPassword() {
         // słabe (długość do 5 znaków, bez znaków specjalnych, tylko małe litery lub duże litery)
 
-        int numberOfCharacters = (int) (5 *  Math.random()) + 1;
-        StringBuilder stringBuilder = new StringBuilder();
+        int numberOfCharacters = getRandomNumberFromRange(1,5);
+        String password = getPasswordWithoutSpecialChars(numberOfCharacters);
 
-        while (stringBuilder.length() < numberOfCharacters) {
-
-            int random = (int) (2 * Math.random());
-            if (random == 0) {
-                stringBuilder.append(getRandomLowerCaseLetter());
-            } else {
-                stringBuilder.append(getRandomUpperCaseLetter());
-            }
-        }
-
-        return new Password(
-                getTimestampDD_MM_YYYY_HH_MM_SS(),
-                String.valueOf(stringBuilder),
+        return new PasswordDTO(
+                getTimestamp(),
+                password,
                 PasswordStrength.WEAK);
     }
 
-    public Password getMediumPassword() {
+    private PasswordDTO getMediumPassword() {
 
 //      średnie (długość powyżej 5 znaków, bez znaków specjalnych, małe lub duże litery)
 
-        int numberOfCharacters =(int) (4 * Math.random()) + 5;
-        StringBuilder stringBuilder = new StringBuilder();
+        int numberOfCharacters =getRandomNumberFromRange(5,8);
+        String password = getPasswordWithoutSpecialChars(numberOfCharacters);
 
-
-        while (stringBuilder.length() < numberOfCharacters) {
-
-            int random = (int) (2 * Math.random());
-            if (random == 0) {
-            stringBuilder.append(getRandomLowerCaseLetter());
-            } else {
-                stringBuilder.append(getRandomLowerCaseLetter());
-            }
-        }
-
-        return new Password(
-                getTimestampDD_MM_YYYY_HH_MM_SS(),
-                String.valueOf(stringBuilder),
+        return new PasswordDTO(
+                getTimestamp(),
+                password,
                 PasswordStrength.MEDIUM);
     }
 
-    public Password getStrongPassword() {
+    private String getPasswordWithoutSpecialChars(int numberOfCharacters) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        while (stringBuilder.length() < numberOfCharacters) {
+
+            int random = getRandomNumberToLimit(2);
+            if (random == 0) {
+                stringBuilder.append(getRandomUpperCaseLetter());
+            } else {
+                stringBuilder.append(getRandomLowerCaseLetter());
+            }
+        }
+        return stringBuilder.toString();
+    }
+
+    private PasswordDTO getStrongPassword() {
 
 //      silne (długość powyżej 8 znaków, znaki specjalne, małe i duże litery)
 
-        int numberOfCharacters = (int) (9 * Math.random()) + 8;
-        StringBuilder stringBuilder = new StringBuilder();
+        int numberOfCharacters = getRandomNumberFromRange(8,16);
+        String password = getPasswordWithSpecialChars(numberOfCharacters);
 
-        while (stringBuilder.length() < numberOfCharacters) {
-
-            int random = (int) (3 * Math.random());
-            if (random == 0) {
-                stringBuilder.append(getRandomLowerCaseLetter());
-            } else if (random == 1) {
-                stringBuilder.append(getRandomLowerCaseLetter());
-            } else {
-                stringBuilder.append(getRandomSpecialCharacter());
-            }
-        }
-
-        return new Password(
-                getTimestampDD_MM_YYYY_HH_MM_SS(),
-                String.valueOf(stringBuilder),
+        return new PasswordDTO(
+                getTimestamp(),
+                password,
                 PasswordStrength.STRONG);
     }
 
-    public Password getUberStrongPassword() {
+    private PasswordDTO getUberStrongPassword() {
 
 //      uber silne (długość powyżej 16 znaków, znaki specjalne, małe i duże litery)
 
-        int numberOfCharacters = (int) (17 * Math.random()) + 16;
+        int numberOfCharacters = getRandomNumberFromRange(16,32);
+        String password = getPasswordWithSpecialChars(numberOfCharacters);
+        return new PasswordDTO(
+                getTimestamp(),
+                password,
+                PasswordStrength.UBER_STRONG);
+    }
+
+    private String getPasswordWithSpecialChars(int numberOfCharacters) {
         StringBuilder stringBuilder = new StringBuilder();
 
         while (stringBuilder.length() < numberOfCharacters) {
 
-            int random = (int) (3 * Math.random());
+            int random = getRandomNumberToLimit(3);
             if (random == 0) {
-                stringBuilder.append(getRandomLowerCaseLetter());
+                stringBuilder.append(getRandomUpperCaseLetter());
             } else if (random == 1) {
                 stringBuilder.append(getRandomLowerCaseLetter());
             } else {
                 stringBuilder.append(getRandomSpecialCharacter());
             }
         }
-
-        return new Password(
-                getTimestampDD_MM_YYYY_HH_MM_SS(),
-                String.valueOf(stringBuilder),
-                PasswordStrength.UBER_STRONG);
+        return stringBuilder.toString();
     }
 
     private char getRandomLowerCaseLetter() {
         String lowerCaseLetters = "abcdefghijklmnopqrstuvwxyz";
-        int random = (int) (lowerCaseLetters.length() * Math.random());
-
-        return lowerCaseLetters.charAt(random);
+        return getRandomCharacterFromString(lowerCaseLetters);
     }
 
     private char getRandomUpperCaseLetter() {
         String upperCaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        int random = (int) (upperCaseLetters.length() * Math.random());
-
-        return upperCaseLetters.charAt(random);
+        return getRandomCharacterFromString(upperCaseLetters);
     }
 
     private char getRandomSpecialCharacter() {
         String specialCharacters = "~`!@#$%^&*()-_+={}[]|\\/:;\"'<>,.?";
-        int random = (int) (specialCharacters.length() * Math.random());
-
-        return specialCharacters.charAt(random);
+        return getRandomCharacterFromString(specialCharacters);
     }
 
-    private String getTimestampDD_MM_YYYY_HH_MM_SS() {
-        LocalDateTime timestamp = LocalDateTime.now();
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
-        return timestamp.format(dateTimeFormatter);
+    private char getRandomCharacterFromString(String passwordLetters) {
+        return passwordLetters.charAt(getRandomNumberToLimit(passwordLetters.length()));
+    }
+    private int getRandomNumberToLimit(int limit) {
+        return (int) (limit * Math.random());
     }
 
-    public static void main(String[] args) {
-    PasswordServiceImpl passwordService = new PasswordServiceImpl();
-    Password password = passwordService.getStrongPassword();
-        System.out.println(password.getDate());
-        System.out.println(password.getPassword());
-        System.out.println(password.getPasswordStrength());
-
+    private int getRandomNumberFromRange(int minRange, int maxRange) {
+        return (int) ((maxRange - minRange + 1) + minRange * Math.random());
     }
+
+    private LocalDateTime getTimestamp() {
+        return LocalDateTime.now();
+    }
+
 
 }
