@@ -31,4 +31,8 @@ public class Password {
         this.password = password;
         this.strength = strength;
     }
+    public Password(String password, PasswordStrength strength) {
+        this.password = password;
+        this.strength = strength;
+    }
 }

@@ -12,4 +12,5 @@ public class PasswordDTO {
     private LocalDateTime date;
     private String password;
     private PasswordStrength passwordStrength;
+    private Source source;
 }
