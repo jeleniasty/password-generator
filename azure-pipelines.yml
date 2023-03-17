@@ -30,6 +30,6 @@ steps:
     maxTestFailuresToShow: '15'
     includeOthersInTotal: false
     usePreviousEnvironment: false
-    enableTLS: true
+    enableTLS: false
     smtpConnectionEndpoint: 'SMTPForEmailReportTaskTest'
     
