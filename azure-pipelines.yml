@@ -19,16 +19,30 @@ steps:
     echo See https://aka.ms/yaml
   displayName: 'Run a multi-line script'
     
-- task: EmailReport@1
+#- task: EmailReport@1
+#  inputs:
+#    sendMailConditionConfig: 'Always'
+#    subject: 'test subject'
+#    toAddress: 'michal.jeleniasty@gmail.com;mjelen@freeportmetrics.com'
+#    defaultDomain: 'microsoft.com'
+#    groupTestResultsBy: 'run'
+#    includeCommits: false
+#    maxTestFailuresToShow: '15'
+#    includeOthersInTotal: false
+#    usePreviousEnvironment: false
+#    smtpConnectionEndpoint: 'SMTPForEmailReportTaskTest'
+
+
+- task: CalromEmailReport@1
   inputs:
     sendMailConditionConfig: 'Always'
-    subject: 'test subject'
+    subject: 'test subject caldrom'
     toAddress: 'michal.jeleniasty@gmail.com;mjelen@freeportmetrics.com'
-    defaultDomain: 'microsoft.com'
+    defaultDomain: 'xxxxxxx.com'
     groupTestResultsBy: 'run'
-    includeCommits: false
+    includeCommits: true
     maxTestFailuresToShow: '15'
     includeOthersInTotal: false
     usePreviousEnvironment: false
     smtpConnectionEndpoint: 'SMTPForEmailReportTaskTest'
-    
+
