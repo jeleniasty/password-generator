@@ -40,7 +40,7 @@ steps:
     toAddress: 'michal.jeleniasty@gmail.com;mjelen@freeportmetrics.com'
     defaultDomain: 'xxxxxxx.com'
     groupTestResultsBy: 'run'
-    includeCommits: true
+    includeCommits: false
     maxTestFailuresToShow: '15'
     includeOthersInTotal: false
     usePreviousEnvironment: false
