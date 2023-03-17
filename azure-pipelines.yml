@@ -22,7 +22,9 @@ steps:
   inputs:
     sendMailConditionConfig: 'Always'
     subject: '[{environmentStatus}] {passPercentage} tests passed in $(Release.EnvironmentName) stage for $(Build.BuildNumber)'
-    toAddress: 'pd3981@pjwstk.edu.pl'
+    toAddress:
+      - 'pd3981@pjwstk.edu.pl'
+      - 'mjelen@freeportmetrics.com'
     defaultDomain: 'microsoft.com'
     includeResultsStr: '1'
     groupTestResultsBy: 'run'
