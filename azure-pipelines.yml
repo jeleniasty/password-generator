@@ -23,13 +23,12 @@ steps:
   inputs:
     sendMailConditionConfig: 'Always'
     subject: 'test subject'
-    toAddress: 'mjelen@freeportmetrics.com'
+    toAddress: 'mjelen@freeportmetrics.com;michal.jeleniasty@gmail.com'
     defaultDomain: 'microsoft.com'
     groupTestResultsBy: 'run'
     includeCommits: false
     maxTestFailuresToShow: '15'
     includeOthersInTotal: false
     usePreviousEnvironment: false
-    enableTLS: false
     smtpConnectionEndpoint: 'SMTPForEmailReportTaskTest'
     
