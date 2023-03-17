@@ -26,8 +26,10 @@ steps:
     toAddress: 'mjelen@freeportmetrics.com'
     defaultDomain: 'microsoft.com'
     groupTestResultsBy: 'run'
-    includeCommits: true
+    includeCommits: false
     maxTestFailuresToShow: '15'
     includeOthersInTotal: false
     usePreviousEnvironment: false
+    enableTLS: true
     smtpConnectionEndpoint: 'SMTPForEmailReportTaskTest'
+    
