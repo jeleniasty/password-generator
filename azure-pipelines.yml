@@ -1,17 +1,4 @@
-# Starter pipeline
-- task: EmailReport@1
-  inputs:
-    sendMailConditionConfig: 'Always'
-    subject: '[{environmentStatus}] {passPercentage} tests passed in $(Release.EnvironmentName) stage for $(Build.BuildNumber)'
-    toAddress: 'pd3981@pjwstk.edu.pl'
-    defaultDomain: 'microsoft.com'
-    includeResultsStr: '1, 2'
-    groupTestResultsBy: 'run'
-    includeCommits: true
-    maxTestFailuresToShow: '15'
-    includeOthersInTotal: false
-    usePreviousEnvironment: false
-    
+# Starter pipeline   
 # Start with a minimal pipeline that you can customize to build and deploy your code.
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
@@ -30,3 +17,17 @@ steps:
     echo Add other tasks to build, test, and deploy your project.
     echo See https://aka.ms/yaml
   displayName: 'Run a multi-line script'
+
+- task: EmailReport@1
+  inputs:
+    sendMailConditionConfig: 'Always'
+    subject: '[{environmentStatus}] {passPercentage} tests passed in $(Release.EnvironmentName) stage for $(Build.BuildNumber)'
+    toAddress: 'pd3981@pjwstk.edu.pl'
+    defaultDomain: 'microsoft.com'
+    includeResultsStr: '1'
+    groupTestResultsBy: 'run'
+    includeCommits: true
+    maxTestFailuresToShow: '15'
+    includeOthersInTotal: false
+    usePreviousEnvironment: false
+    smtpConnectionEndpoint: "SMTP for emailreport test"
