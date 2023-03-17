@@ -17,17 +17,18 @@ steps:
     echo Add other tasks to build, test, and deploy your project.
     echo See https://aka.ms/yaml
   displayName: 'Run a multi-line script'
-
+    
 - task: EmailReport@1
   inputs:
     sendMailConditionConfig: 'Always'
-    subject: '[{environmentStatus}] {passPercentage} tests passed in stage for $(Build.BuildNumber)'
-    toAddress: mjelen@freeportmetrics.com
+    subject: '[{environmentStatus}] {passPercentage} tests passed in $(Release.EnvironmentName) stage for $(Build.BuildNumber)'
+    toAddress: 'pd3981@pjwstk.edu.pl'
+    includeInCcSectionStr: 1
+    ccAddress: 'mjelen@freeportmetrics.com'
     defaultDomain: 'microsoft.com'
     groupTestResultsBy: 'run'
-    includeCommits: false
+    includeCommits: true
     maxTestFailuresToShow: '15'
     includeOthersInTotal: false
     usePreviousEnvironment: false
-    enableTLS: true
     smtpConnectionEndpoint: 'SMTPForEmailReportTaskTest'
