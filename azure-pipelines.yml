@@ -21,14 +21,13 @@ steps:
 - task: EmailReport@1
   inputs:
     sendMailConditionConfig: 'Always'
-    subject: '[{environmentStatus}] {passPercentage} tests passed in $(Release.EnvironmentName) stage for $(Build.BuildNumber)'
-    toAddress: 'pd3981@pjwstk.edu.pl'
-    includeInCcSectionStr: '1'
-    ccAddress: 'mjelen@freeportmetrics.com'
+    subject: '[{environmentStatus}] {passPercentage} tests passed in stage for $(Build.BuildNumber)'
+    toAddress: mjelen@freeportmetrics.com
     defaultDomain: 'microsoft.com'
     groupTestResultsBy: 'run'
-    includeCommits: true
+    includeCommits: false
     maxTestFailuresToShow: '15'
     includeOthersInTotal: false
     usePreviousEnvironment: false
+    enableTLS: true
     smtpConnectionEndpoint: 'SMTPForEmailReportTaskTest'
