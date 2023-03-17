@@ -23,8 +23,7 @@ steps:
   inputs:
     sendMailConditionConfig: 'Always'
     subject: 'test subject'
-    toAddress: 'pd3981@pjwstk.edu.pl'
-    ccAddress: 'mjelen@freeportmetrics.com'
+    toAddress: 'mjelen@freeportmetrics.com'
     defaultDomain: 'microsoft.com'
     groupTestResultsBy: 'run'
     includeCommits: true
